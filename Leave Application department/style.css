@@ -112,8 +112,127 @@ button {
   justify-content: center;
   align-items: center;
 }
+#btn1{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
 
 
 button:hover {
   background-color: #0aa9a8;
 }
+
+/* style.css */
+
+/* Existing styles... */
+
+.container {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+}
+
+.chart-container {
+  width: 50%;
+  margin: 20px auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.navigation-buttons button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.navigation-buttons button:hover {
+  background-color: #45a049;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Add to style.css */
+
+/* Responsive table */
+@media screen and (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+      display: block;
+  }
+
+  th {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+  }
+
+  td {
+      border: none;
+      position: relative;
+      padding-left: 50%;
+  }
+
+  td:before {
+      position: absolute;
+      top: 12px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+  }
+
+  /* Labels for table data */
+  td:nth-of-type(1):before { content: "Leave ID"; }
+  td:nth-of-type(2):before { content: "Leave Type"; }
+  td:nth-of-type(3):before { content: "Start Date"; }
+  td:nth-of-type(4):before { content: "End Date"; }
+  td:nth-of-type(5):before { content: "Reason"; }
+  td:nth-of-type(6):before { content: "Date Requested"; }
+  td:nth-of-type(7):before { content: "Status"; }
+  td:nth-of-type(8):before { content: "Comments"; }
+}
+
