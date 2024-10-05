@@ -26,11 +26,11 @@ $department = htmlspecialchars($_SESSION['department']);
             <!-- Employee ID is stored in session and hidden -->
             <input type="hidden" name="employee_id" value="<?php echo htmlspecialchars($_SESSION['user_id']); ?>">
 
-            <!-- Employee Name (auto-filled and hidden) -->
+            <!-- Employee Name (auto-filled and hidden)
             <input type="hidden" name="employee_name" value="<?php echo $username; ?>">
 
-            <!-- Department (auto-filled and hidden) -->
-            <input type="hidden" name="department" value="<?php echo $department; ?>">
+            Department (auto-filled and hidden)
+            <input type="hidden" name="department" value="<?php echo $department; ?>"> -->
 
             <!-- Type of Leave -->
             <label for="leave_type">Type of Leave:</label>
