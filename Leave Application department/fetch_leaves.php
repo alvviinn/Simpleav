@@ -29,7 +29,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Prepare and execute the query
-$stmt = $conn->prepare("SELECT leave_id, leave_type, start_date, end_date, reason, date_requested, current_status, comments FROM tbl_leave WHERE user_id = ? ORDER BY date_requested DESC");
+$stmt = $conn->prepare("SELECT leave_id, leave_type, startdate, end_date, reason, date_requested, current_status, comments FROM tbl_leave WHERE user_id = ? ORDER BY date_requested DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();

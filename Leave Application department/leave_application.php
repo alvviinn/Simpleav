@@ -90,8 +90,8 @@ $leave_types = [
                 </div>
 
                 <div class="form-group">
-                    <label for="startDate">Start Date</label>
-                    <input type="date" id="startDate" name="start_date" required>
+                    <label for="startdate">Start Date</label>
+                    <input type="date" id="startdate" name="startdate" required>
                 </div>
 
                 <div class="form-group">
@@ -115,7 +115,7 @@ $leave_types = [
         </form>
 
         <!-- Navigation Button -->
-        <div class="form-group" id = "btn1">
+        <div class="form-group" id="btn1">
             <a href="user_portal.php"><button>Back to Home</button></a>
         </div>
     </div>

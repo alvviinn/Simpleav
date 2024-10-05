@@ -65,7 +65,7 @@ foreach ($max_leave as $type => $max_days) {
 }
 
 // Prepare statement to fetch used leave
-$stmt_leave = $conn->prepare("SELECT leave_type, DATEDIFF(end_date, start_date) + 1 AS days_taken FROM tbl_leave WHERE user_id = ? AND current_status = 1"); // Assuming current_status=1 means approved
+$stmt_leave = $conn->prepare("SELECT leave_type, DATEDIFF(end_date, startdate) + 1 AS days_taken FROM tbl_leave WHERE user_id = ? AND current_status = 1"); // Assuming current_status=1 means approved
 $stmt_leave->bind_param("i", $user_id);
 $stmt_leave->execute();
 $result_leave = $stmt_leave->get_result();
@@ -92,7 +92,7 @@ foreach ($max_leave as $type => $max_days) {
 // Fetch leave applications
 $leave_applications = array();
 
-$stmt_applications = $conn->prepare("SELECT leave_id, leave_type, start_date, end_date, current_status, comments, approval_timestamp FROM tbl_leave WHERE user_id = ? ORDER BY date_requested DESC");
+$stmt_applications = $conn->prepare("SELECT leave_id, leave_type, startdate, end_date, current_status, comments, approval_timestamp FROM tbl_leave WHERE user_id = ? ORDER BY date_requested DESC");
 $stmt_applications->bind_param("i", $user_id);
 $stmt_applications->execute();
 $result_applications = $stmt_applications->get_result();
@@ -235,13 +235,13 @@ $conn->close();
             <div class="logo">SIMPLEAV</div>
             <nav>
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="user_portal.php">Home</a></li>
                     <li><a href="#">Leave Requests</a></li>
                     <li><a href="#">Help</a></li>
                 </ul>
             </nav>
             <div class="profile">
-                <img src="<?php echo htmlspecialchars($profile_image ?? 'img/avatar.png'); ?>" alt="Profile Picture" class="profile-img">
+                <img src="<?php echo htmlspecialchars($profile_image ?? '../img/Avatar.png'); ?>" alt="Profile Picture" class="profile-img">
             </div>
         </div>
     </header>
@@ -249,12 +249,12 @@ $conn->close();
     <div class="portal-container">
         <!-- User Details -->
         <div class="user-details">
-            <h2><?php echo htmlspecialchars($username ?? ''); ?></h2>
-            <p><strong>Email:</strong> <?php echo htmlspecialchars($email ?? ''); ?></p>
-            <p><strong>Company:</strong> <?php echo htmlspecialchars($company ?? ''); ?></p>
-            <p><strong>Department:</strong> <?php echo htmlspecialchars($department ?? ''); ?></p>
-            <p><strong>Role:</strong> <?php echo htmlspecialchars($role ?? ''); ?></p>
-            <p><strong>Position:</strong> <?php echo htmlspecialchars($position ?? ''); ?></p>
+            <h1><?php echo htmlspecialchars($username ?? ''); ?></h1>
+            <h2><strong>Email:</strong> <?php echo htmlspecialchars($email ?? ''); ?></h2>
+            <h2><strong>Company:</strong> <?php echo htmlspecialchars($company ?? ''); ?></h2>
+            <h2><strong>Department:</strong> <?php echo htmlspecialchars($department ?? ''); ?></h2>
+            <h2><strong>Role:</strong> <?php echo htmlspecialchars($role ?? ''); ?></h2>
+            <h2><strong>Position:</strong> <?php echo htmlspecialchars($position ?? ''); ?></h2>
         </div>
 
         <!-- Leave Balance Pie Chart -->
@@ -271,7 +271,7 @@ $conn->close();
 
     <!-- Leave Applications Table -->
     <div class="leave-table-container">
-        <h3>Past Leave Applications</h3>
+        <h3 style="margin-left: 40px;">Past Leave Applications</h3>
         <table class="leave-table">
             <thead>
                 <tr>
@@ -290,8 +290,8 @@ $conn->close();
                         <tr>
                             <td><?php echo htmlspecialchars($application['leave_id'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars($application['leave_type'] ?? ''); ?></td>
-                            <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($application['start_date']))); ?></td>
-                            <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($application['end_date']))); ?></td>
+                            <td><?php echo htmlspecialchars(date("d-m-Y", strtotime($application['startdate']))); ?></td>
+                            <td><?php echo htmlspecialchars(date("d-m-Y", strtotime($application['end_date']))); ?></td>
                             <td>
                                 <?php
                                     $status = $application['current_status'];
@@ -309,7 +309,7 @@ $conn->close();
                             <td>
                                 <?php
                                     if ($application['approval_timestamp']) {
-                                        echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($application['approval_timestamp'])));
+                                        echo htmlspecialchars(date("d-m-Y H:i:s", strtotime($application['approval_timestamp'])));
                                     } else {
                                         echo 'N/A';
                                     }
@@ -329,12 +329,18 @@ $conn->close();
 
     <!-- Chart.js Script for Pie Chart -->
     <script>
-        // Data for the pie chart
-        const leaveData = {
-            labels: <?php echo json_encode(array_keys($max_leave)); ?>,
-            datasets: [{
-                label: 'Leave Balance',
-                data: <?php echo json_encode(array_values($remaining_leave)); ?>,
+    // Assuming $remaining_leave and $max_leave are available in PHP
+    const usedLeave = <?php echo json_encode(array_values($remaining_leave)); ?>; // Used leave
+    const maxLeave = <?php echo json_encode(array_values($max_leave)); ?>; // Max leave
+    const remainingLeave = maxLeave.map((max, index) => max - usedLeave[index]); // Calculate remaining leave
+
+    // Data for the pie chart
+    const leaveData = {
+        labels: <?php echo json_encode(array_keys($max_leave)); ?>,
+        datasets: [
+            {
+                label: 'Used Leave',
+                data: usedLeave,
                 backgroundColor: [
                     '#FF6384',
                     '#36A2EB',
@@ -343,39 +349,51 @@ $conn->close();
                     '#FF9800',
                     '#9C27B0'
                 ],
+                borderColor: 'black', // Set border color
+                borderWidth: 1, // Set border width to 1px
                 hoverOffset: 4
-            }]
-        };
+            },
+            {
+                label: 'Remaining Leave',
+                data: remainingLeave,
+                backgroundColor: 'maroon', // Color for remaining leave
+                borderColor: 'black', // Set border color for remaining leave
+                borderWidth: 1, // Set border width to 1px
+                hoverOffset: 4
+            }
+        ]
+    };
 
-        // Configuration options
-        const config = {
-            type: 'pie',
-            data: leaveData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Leave Balances',
-                        font: {
-                    size: 22, // Adjust the font size as needed
-                    weight: 'bold', // Make the font bold
-                }
+    // Configuration options
+    const config = {
+        type: 'pie',
+        data: leaveData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Leave Balances',
+                    font: {
+                        size: 22, // Adjust the font size as needed
+                        weight: 'bold', // Make the font bold
                     }
                 }
-            },
-        };
+            }
+        },
+    };
 
-        // Render the pie chart
-        const leaveChart = new Chart(
-            document.getElementById('leaveChart'),
-            config
-        );
-    </script>
+    // Render the pie chart
+    const leaveChart = new Chart(
+        document.getElementById('leaveChart'),
+        config
+    );
+</script>
+
 
 </body>
 </html>

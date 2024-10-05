@@ -12,18 +12,6 @@ session_start();
 // Include the database connection
 require_once '../DATABASE/db_connect.php';
 
-/* 
-    // The following section is commented out because login/registration is handled by another team.
-    // Once available, you can uncomment this section to ensure only authenticated users can submit leave applications.
-
-    // Check if the user is logged in
-    if (!isset($_SESSION['user_id'])) {
-        // Redirect to login page or show an error
-        header("Location: login.php");
-        exit();
-    }
-*/
-
 // For now, we'll simulate a logged-in user.
 // Remove the following lines once login is integrated.
 if (!isset($_SESSION['user_id'])) {
@@ -40,31 +28,30 @@ $success = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize form inputs
     $leave_type = trim($_POST['leave_type']);
-    $start_date = $_POST['start_date'];
+    $startdate = $_POST['startdate'];
     $end_date = $_POST['end_date'];
     $reason = trim($_POST['reason']);
     $user_id = intval($_SESSION['user_id']);
 
     // Basic validation
-    if (empty($leave_type) || empty($start_date) || empty($end_date) || empty($reason)) {
+    if (empty($leave_type) || empty($startdate) || empty($end_date) || empty($reason)) {
         $error = "All fields are required.";
-    } elseif ($start_date > $end_date) {
+    } elseif ($startdate > $end_date) {
         $error = "Start date cannot be after end date.";
     } else {
         // Calculate the number of leave days (inclusive)
-        $start = new DateTime($start_date);
-        $end = new DateTime($end_date);
-        $interval = $start->diff($end);
+        $startdate_obj = DateTime::createFromFormat('Y-m-d', $startdate);
+        $end_date_obj = DateTime::createFromFormat('Y-m-d', $end_date);
+        $interval = $startdate_obj->diff($end_date_obj);
         $leave_days = $interval->days + 1; // +1 to include both start and end dates
 
         // Optional: Check if leave dates overlap with existing approved leaves for the employee
-        
         $check_stmt = $conn->prepare("SELECT * FROM tbl_leave WHERE user_id = ? AND current_status = 1 AND (
-            (start_date <= ? AND end_date >= ?) OR
-            (start_date <= ? AND end_date >= ?) OR
-            (start_date >= ? AND end_date <= ?)
+            (startdate <= ? AND end_date >= ?) OR
+            (startdate <= ? AND end_date >= ?) OR
+            (startdate >= ? AND end_date <= ?)
         )");
-        $check_stmt->bind_param("issssss", $user_id, $start_date, $start_date, $end_date, $end_date, $start_date, $end_date);
+        $check_stmt->bind_param("issssss", $user_id, $startdate, $startdate, $end_date, $end_date, $startdate, $end_date);
         $check_stmt->execute();
         $check_stmt->store_result();
 
@@ -75,47 +62,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $check_stmt->close();
-        
 
         if (empty($error)) {
-            // Prepare the SQL statement to prevent SQL injection
-            $stmt = $conn->prepare("INSERT INTO tbl_leave (user_id, date_requested, leave_type, used_leave, days_remaining, current_status, start_date, end_date, approved_by, approval_timestamp, comments) VALUES (?, NOW(), ?, ?, ?, 0, ?, ?, NULL, NULL, NULL)");
-            if ($stmt === false) {
-                $error = "Prepare failed: (" . $conn->errno . ") " . $conn->error;
-            } else {
-                // Assume maximum leave days per type (for days_remaining calculation)
-                $max_leave_days = [
-                    "Sick Leave" => 14,
-                    "Casual Leave" => 7,
-                    "Annual Leave" => 21,
-                    "Maternity Leave" => 90,
-                    "Paternity Leave" => 14,
-                    "Bereavement Leave" => 5
-                ];
+            // Assume maximum leave days per type (for days_remaining calculation)
+            $max_allowed_days = [
+                "Sick Leave" => 14,
+                "Casual Leave" => 10,
+                "Annual Leave" => 30,
+                "Maternity Leave" => 90,
+                "Paternity Leave" => 15,
+                "Bereavement Leave" => 7
+            ];
 
-                // Calculate days_remaining based on maximum allowed
-                $current_leave_type = $leave_type;
-                $max_days = isset($max_leave_days[$current_leave_type]) ? $max_leave_days[$current_leave_type] : 0;
-                $days_remaining = $max_days - $leave_days;
+            // Check if the requested days exceed the maximum allowed for the leave type
+            if ($leave_days > $max_allowed_days[$leave_type]) {
+                $error = "You have requested $leave_days days for $leave_type, which exceeds the maximum allowed of " . $max_allowed_days[$leave_type] . " days.";
+            }
 
-                // Bind parameters
-                $stmt->bind_param("isiiiss",
-                    $user_id,
-                    $leave_type,
-                    $leave_days,
-                    $days_remaining,
-                    $start_date,
-                    $end_date
-                );
-
-                // Execute the statement
-                if ($stmt->execute()) {
-                    $success = "Leave application submitted successfully.";
+            if (empty($error)) {
+                // Proceed with the database insertion if validation passes
+                $stmt = $conn->prepare("INSERT INTO tbl_leave (user_id, date_requested, leave_type, department, used_leave, days_remaining, current_status, startdate, end_date, comments) 
+                VALUES (?, NOW(), ?, ?, ?, ?, 'Pending', ?, ?, ?)");
+                if ($stmt === false) {
+                    $error = "Prepare failed: (" . $conn->errno . ") " . $conn->error;
                 } else {
-                    $error = "Error: " . $stmt->error;
-                }
+                    $department = $_SESSION['department']; // Use 'department' from session
+                    $used_leave = $leave_days; // Number of days requested
+                    $days_remaining = $max_allowed_days[$leave_type] - $used_leave; // Calculate remaining days
 
-                // Close the statement
+                    $stmt->bind_param('issiisss', $user_id, $leave_type, $department, $used_leave, $days_remaining, $startdate, $end_date, $reason);
+                    $stmt->execute();
+
+                    $success = "Leave application submitted successfully.";
+                }
                 $stmt->close();
             }
         }
@@ -140,7 +119,7 @@ $conn->close();
             <div class="logo">SIMPLEAV</div>
             <nav>
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="user_portal.php">Home</a></li>
                     <li><a href="#">Leave Requests</a></li>
                     <li><a href="#">Help</a></li>
                 </ul>
@@ -165,13 +144,11 @@ $conn->close();
                 <a href="user_portal.php">Return to Home</a>
             </div>
         <?php else: ?>
-            <!-- If accessed directly without form submission -->
             <div class="error">
                 <p>Invalid access.</p>
                 <a href="leave_application.php">Go to Leave Application Form</a>
             </div>
         <?php endif; ?>
-
     </div>
 
 </body>
