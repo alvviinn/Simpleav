@@ -3,10 +3,10 @@
 session_start();
 
 // Check if user is logged in
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_SESSION['username'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 $username = htmlspecialchars($_SESSION['username']);
 $department = htmlspecialchars($_SESSION['department']);
