@@ -7,47 +7,49 @@ session_start();
 // Include the database connection
 require_once '../DATABASE/db_connect.php';
 
-/* 
-    // The following section is commented out because login/registration is handled by another team.
-    // Once available, you can uncomment this section to ensure only authenticated users can access the form.
-
-    // Check if the user is logged in
-    if (!isset($_SESSION['user_id'])) {
-        // Redirect to login page or show an error
-        header("Location: login.php");
-        exit();
-    }
-*/
-
-// For now, we'll simulate a logged-in user.
-// Remove the following lines once login is integrated.
+// Simulate a logged-in user (for testing purposes)
 if (!isset($_SESSION['user_id'])) {
-    // Simulate a user with user_id = 1 (ensure this user exists in tbl_user)
     $_SESSION['user_id'] = 1;
-    // Optionally, retrieve other user details if needed
-    // For example, retrieve department from tbl_user
-    $stmt = $conn->prepare("SELECT `username`, `department` FROM `tbl_user` WHERE `user_id` = ?");
+
+    // Retrieve user details, including gender
+    $stmt = $conn->prepare("SELECT `username`, `department`, `gender` FROM `tbl_user` WHERE `user_id` = ?");
     $stmt->bind_param("i", $_SESSION['user_id']);
-    $stmt->execute();
-    $stmt->bind_result($username, $department);
-    $stmt->fetch();
-    $_SESSION['username'] = $username;
-    $_SESSION['department'] = $department;
+    
+    if (!$stmt->execute()) {
+        echo "Error executing statement: " . $stmt->error;
+    }
+    
+    $stmt->bind_result($username, $department, $gender);
+
+    // Fetch user details and store in session
+    if ($stmt->fetch()) {
+        $_SESSION['username'] = $username;
+        $_SESSION['department'] = $department;
+        $_SESSION['gender'] = $gender;
+    } else {
+        echo "<p>Debug: User not found or data could not be retrieved. Please check the database.</p>";
+    }
     $stmt->close();
 }
 
-$username = htmlspecialchars($_SESSION['username']);
-$department = htmlspecialchars($_SESSION['department']);
+// Initialize session variables with default values to prevent undefined errors
+$username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : "Unknown User";
+$department = isset($_SESSION['department']) ? htmlspecialchars($_SESSION['department']) : "Unknown Department";
+$gender = isset($_SESSION['gender']) ? htmlspecialchars($_SESSION['gender']) : "Unknown";
 
-// Define predefined leave types
-$leave_types = [
-    "Sick Leave",
-    "Casual Leave",
-    "Annual Leave",
-    "Maternity Leave",
-    "Paternity Leave",
-    "Bereavement Leave"
-];
+// Convert gender to uppercase for consistent checking
+$gender = strtoupper($gender);
+
+// Debugging: Print gender value to ensure it is correct
+echo "<p>Debug: Gender is $gender</p>"; // Remove this line after debugging
+
+// Define leave types based on gender
+$leave_types = ["Sick Leave", "Casual Leave", "Annual Leave", "Compassionate Leave"];
+if ($gender === 'MALE') {
+    $leave_types[] = "Paternity Leave";
+} elseif ($gender === 'FEMALE') {
+    $leave_types[] = "Maternity Leave";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +82,6 @@ $leave_types = [
             <div class="form-row">
                 <div class="form-group">
                     <label for="leaveType">Leave Type</label>
-                    <!-- Changed from input type="text" to select dropdown -->
                     <select id="leaveType" name="leave_type" required>
                         <option value="">--Select Leave Type--</option>
                         <?php foreach ($leave_types as $type): ?>
@@ -100,7 +101,6 @@ $leave_types = [
                 </div>
             </div>
 
-            <!-- Department and Employee Name are auto-filled and hidden -->
             <input type="hidden" name="department" value="<?php echo $department; ?>">
             <input type="hidden" name="employee_name" value="<?php echo $username; ?>">
 
@@ -114,7 +114,6 @@ $leave_types = [
             </div>
         </form>
 
-        <!-- Navigation Button -->
         <div class="form-group" id="btn1">
             <a href="user_portal.php"><button>Back to Home</button></a>
         </div>
