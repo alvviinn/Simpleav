@@ -112,8 +112,9 @@ if ($gender === 'MALE') {
             <div class="form-group" id="btn">
                 <button type="submit">Submit</button>
             </div>
-            <br>
+           
         </form>
+        <br>
 
         <div class="form-group" id="btn1">
             <a href="user_portal.php"><button>Back to Home</button></a>

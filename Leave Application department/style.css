@@ -113,10 +113,19 @@ button {
   align-items: center;
 }
 #btn1{
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+   margin-left: 580px;
+ min-width: 200px;
+   margin-top: 20px;
+
+ 
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  
+
+
 }
 
 
@@ -129,13 +138,13 @@ button:hover {
 /* Existing styles... */
 
 .container {
-  width: 80%;
+  width: 90%;
   margin: auto;
   padding: 20px;
 }
 
 .chart-container {
-  width: 50%;
+  width: 60%;
   margin: 20px auto;
 }
 

@@ -53,7 +53,7 @@ $max_leave = array(
     "Annual Leave" => 21,
     "Maternity Leave" => 90,
     "Paternity Leave" => 10,
-    "Bereavement Leave" => 5
+    "Compassionate Leave" => 5
 );
 
 // Fetch used leave per type (approved leaves)
