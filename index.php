@@ -36,7 +36,7 @@
   <ul class = "navlinks">
     <a href="#home">Home</a>
     <a href="#shop">Subscription</a>
-    <a href="/">About Us </a>
+    <a href="Leave Application department\UI.php">About Us </a>
     <a href="/">Contacts</a>
 
 

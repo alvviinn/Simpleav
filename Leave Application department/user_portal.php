@@ -145,7 +145,7 @@ $conn->close();
             <div class="logo">SIMPLEAV</div>
             <nav>
                 <ul>
-                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="UI.php">Home</a></li>
                     <li><a href="../user login/logout.php">Logout</a></li>
                 </ul>
             </nav>
