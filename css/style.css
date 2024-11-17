@@ -264,8 +264,8 @@ header.sticky {
 
 .box {
   position: relative;
-  background: linear-gradient(250.55deg, #001f3f 0%, #003366 28.55%, #00509e 75.55%);
-  padding: 40px 60px;
+  background: linear-gradient(250.55deg, #000000 0%, #000000 28.55%, #000000 75.55%);
+  padding: 70px 70px;
   border-radius: 0.8rem;
 }
 
@@ -276,10 +276,14 @@ header.sticky {
   font-family: "Forum", serif;
 }
 
-.box h3 {
-  font-size: 14px;
+.box h2{
+  font-size: 50px;
   color: var(--othercolor);
   font-weight: 500;
+  font-family: "Forum", serif;
+  margin: 12px 0;
+
+
 }
 
 .feature i {

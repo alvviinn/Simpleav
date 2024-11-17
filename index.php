@@ -36,13 +36,13 @@
   <ul class = "navlinks">
     <a href="#home">Home</a>
     <a href="#shop">Subscription</a>
-    <a href="Leave Application department\UI.php">About Us </a>
-    <a href="/">Contacts</a>
+    <a href="#about">About Us </a>
+    <a href="#contact">Contacts</a>
 
 
   </ul>
   <div class = "nav-side">
-    <a href="user login\login.php" class = "n-btn"> Sign in</a>
+    <a href="User interface\login.php" class = "n-btn"> Sign In</a>
     <div class = "bx bx-menu" id = "menu-icon"> </div>
 
   </div>
@@ -75,7 +75,7 @@
 <!--about-->
 <section class = "about" id = "about">
   <div class = "about-img" data-aos="zoom-in"  data-aos-duration = "1400" >
-    <img src="/" >
+    <img src="" >
 
   </div>
   <div class  = "about-text" data-aos="fade-up"  data-aos-duration = "1400" >
@@ -93,29 +93,31 @@
 <section class = "shop" id="shop">
   <div class = "head-text" data-aos="fade-in"  data-aos-duration = "1400" data-aos-delay ="100">
     <div class = "head-left">
-      <h4>Payments</h4>
+
+
+      </div>
+
 
     </div>
     <div class  = "head-right">
-      <h4>Try Out Our Subscription Plan</h4>
 
     </div>
 <div class = "shop-content" data-aos="fade-in"  data-aos-duration = "1400" data-aos-delay ="200">
   <div class="box">
-    <div class="box-img">
-      <img src="/" >
+    <h2 >Check Out Our Payment Plan</h2> <br>
+    <div class="box-img " >
+      <img src="image/img.png" >
 
     </div>
-    <h3>Subscribe To Simpleav</h3>
     <div class = "feature">
-      <a href="/"><i class='bx bx-play-circle'></i></a>
+      <a href="pay1.php"><i class='bx bx-play-circle'></i></a>
 
     </div>
   </div>
 
 
 </div>
-</div>
+
 
 
 </section>
@@ -127,9 +129,9 @@
     <hr>
     <p>Strathmore University , Ole-Sangale Road</p>
     <div class="s-links">
-      <a href="/" class="s-btnn">Facebook</a>
-      <a href="/" class="s-btnn">Instagram</a>
-      <a href="/" class = "s-btnn">Reddit</a>
+      <a href="https://www.facebook.com/login.php/" class="s-btnn">Facebook</a>
+      <a href="https://www.instagram.com/accounts/login/?hl=en" class="s-btnn">Instagram</a>
+      <a href="https://www.reddit.com/" class = "s-btnn">Reddit</a>
 
     </div>
 
