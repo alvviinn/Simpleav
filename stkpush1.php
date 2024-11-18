@@ -1,110 +1,131 @@
 <?php
-// Include Access token
-global $access_token;
-include 'accessToken.php';
-date_default_timezone_set('Africa/Nairobi');
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Set up the request URL and other parameters
-$processrequestUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-$callbackurl = 'https://9287-41-80-114-231.ngrok-free.app/Simpleav/callback.php';
-$passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-$BusinessShortCode = "174379";
-$Timestamp = date('YmdHis');
-
-// ENCRYPT DATA TO GET PASSWORD
-$Password = base64_encode($BusinessShortCode . $passkey . $Timestamp);
-$PhoneNumber = '254791905576'; // Phone number to receive the STK push
-$money = '1000';
-$PartyA = $PhoneNumber;
-$PartyB = $BusinessShortCode;
-$AccountReference = "SIMPLEAV";
-$Amount = $money;
-$TransactionDesc = "stk push test";
-
-// Prepare headers for the STK Push request
-$stkpushheader = [
-  'Content-Type: application/json',
-  'Authorization: Bearer ' . $access_token // Ensure this token is valid
-];
-
-// INITIATE CURL
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_URL, $processrequestUrl);
-curl_setopt($curl, CURLOPT_HTTPHEADER, $stkpushheader);
-
-// Prepare the data to be sent in the request
-$curl_post_data = array(
-  'BusinessShortCode' => $BusinessShortCode,
-  'Password' => $Password,
-  'Timestamp' => $Timestamp,
-  'TransactionType' => 'CustomerPayBillOnline',
-  'Amount' => $Amount,
-  'PartyA' => $PartyA,
-  'PartyB' => $PartyB,
-  'PhoneNumber' => $PartyA,
-  'CallBackUrl' => $callbackurl,
-  'AccountReference' => $AccountReference,
-  'TransactionDesc' => $TransactionDesc
-);
-
-// Convert the data to JSON
-$data_string = json_encode($curl_post_data);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_POST, TRUE);
-curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-
-// Execute the CURL request and get the response
-$curl_response = curl_exec($curl);
-
-// Check for cURL errors
-if (curl_errno($curl)) {
-  echo 'Curl error: ' . curl_error($curl);
-} else {
-  // Print the response from the API
-  echo $curl_response;
+// Check if we have a phone number in session
+if (!isset($_SESSION['payment_phone'])) {
+    header("Location: payment1.php?error=missing_phone");
+    exit();
 }
 
-// Close the cURL session
-curl_close($curl);
-
-// Additional code from the second block
-echo "Daraja API by Ayana ";
-
-// Second cURL request (not needed since it's already handled above)
-$ch = curl_init('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest');
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-  'Authorization: Bearer ' . $access_token, // Use the same access token
-  'Content-Type: application/json'
-]);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-  "BusinessShortCode" => $BusinessShortCode,
-  "Password" => $Password, // Use the same password generated above
-  "Timestamp" => $Timestamp,
-  "TransactionType" => "CustomerPayBillOnline",
-  "Amount" => $Amount,
-  "PartyA" => $PartyA,
-  "PartyB" => $BusinessShortCode,
-  "PhoneNumber" => $PartyA,
-  "CallBackURL" => $callbackurl,
-  "AccountReference" => $AccountReference,
-  "TransactionDesc" => $TransactionDesc
-]));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-$response = curl_exec($ch);
-curl_close($ch);
-
-if (curl_errno($curl)) {
-  echo 'Curl error: ' . curl_error($curl);
-} else {
-  // Print the response from the API
-  echo $curl_response;
-
-  // Redirect to the thank you page
-  header("Location: thank you.php");
-  exit();
+if (!isset($_SESSION['payment_phone']) || $_SESSION['plan_type'] !== 'basic') {
+    header("Location: payment1.php?error=invalid_request");
+    exit();
 }
 
-// Output the response from the second request (if needed)
-echo $response;
+try {
+    // Include Access token
+    require_once 'accessToken.php';
+    if (!isset($access_token)) {
+        throw new Exception('Access token not available');
+    }
+
+    // Get and format phone number
+    $phoneNumber = $_SESSION['payment_phone'];
+    $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
+
+    // Ensure the number starts with 254
+    if (substr($phoneNumber, 0, 3) !== '254') {
+        $phoneNumber = '254' . ltrim($phoneNumber, '0');
+    }
+
+    // Log the formatted phone number
+    error_log("Formatted Phone Number: " . $phoneNumber);
+
+    // STK Push parameters
+    $BusinessShortCode = '174379';
+    $passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
+    $Timestamp = date('YmdHis');
+    $Password = base64_encode($BusinessShortCode . $passkey . $Timestamp);
+    $TransactionType = 'CustomerPayBillOnline';
+    $Amount = '1000';
+    $PartyA = $phoneNumber;
+    $PartyB = $BusinessShortCode;
+    $PhoneNumber = $phoneNumber;
+    $CallBackURL = 'https://your-domain.com/callback.php';
+    $AccountReference = 'SIMPLEAV-BASIC';
+    $TransactionDesc = 'Payment for Basic Plan';
+
+    // Log the request parameters
+    error_log("STK Push Request Parameters: " . json_encode([
+        'BusinessShortCode' => $BusinessShortCode,
+        'Password' => $Password,
+        'Timestamp' => $Timestamp,
+        'TransactionType' => $TransactionType,
+        'Amount' => $Amount,
+        'PartyA' => $PartyA,
+        'PartyB' => $PartyB,
+        'PhoneNumber' => $PhoneNumber,
+        'CallBackURL' => $CallBackURL,
+        'AccountReference' => $AccountReference,
+        'TransactionDesc' => $TransactionDesc
+    ]));
+
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => json_encode([
+            'BusinessShortCode' => $BusinessShortCode,
+            'Password' => $Password,
+            'Timestamp' => $Timestamp,
+            'TransactionType' => $TransactionType,
+            'Amount' => $Amount,
+            'PartyA' => $PartyA,
+            'PartyB' => $PartyB,
+            'PhoneNumber' => $PhoneNumber,
+            'CallBackURL' => $CallBackURL,
+            'AccountReference' => $AccountReference,
+            'TransactionDesc' => $TransactionDesc
+        ]),
+        CURLOPT_HTTPHEADER => array(
+            'Authorization: Bearer ' . $access_token,
+            'Content-Type: application/json'
+        ),
+    ));
+
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+
+    // Log raw response
+    error_log("STK Push Raw Response: " . $response);
+
+    if ($err) {
+        throw new Exception("cURL Error: " . $err);
+    }
+
+    $response_data = json_decode($response, true);
+
+    if (!$response_data) {
+        throw new Exception("Failed to decode response: " . $response);
+    }
+
+    // Log decoded response
+    error_log("STK Push Decoded Response: " . print_r($response_data, true));
+
+    if (isset($response_data['ResponseCode']) && $response_data['ResponseCode'] === '0') {
+        // Success
+        $_SESSION['CheckoutRequestID'] = $response_data['CheckoutRequestID'];
+        unset($_SESSION['payment_phone']); // Clear phone from session
+        header("Location: thank_you.php");
+        exit();
+    } else {
+        // Get specific error message
+        $errorMessage = $response_data['errorMessage'] ??
+                       $response_data['ResponseDescription'] ??
+                       'Unknown error occurred';
+        throw new Exception($errorMessage);
+    }
+
+} catch (Exception $e) {
+    error_log("Payment Error: " . $e->getMessage());
+    header("Location: payment1.php?error=payment_failed&message=" . urlencode($e->getMessage()));
+    exit();
+}
 

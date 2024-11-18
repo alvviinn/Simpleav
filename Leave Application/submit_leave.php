@@ -12,6 +12,9 @@ session_start();
 // Include the database connection
 require_once '../DATABASE/db_connect.php';
 
+// Include the email service
+require_once '../User Interface/emailService.php';
+
 // For now, we'll simulate a logged-in user.
 // Remove the following lines once login is integrated.
 if (!isset($_SESSION['user_id'])) {
@@ -81,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (empty($error)) {
                 // Proceed with the database insertion if validation passes
-                $stmt = $conn->prepare("INSERT INTO tbl_leave (user_id, date_requested, leave_type, department, used_leave, days_remaining, current_status, startdate, end_date, comments) 
+                $stmt = $conn->prepare("INSERT INTO tbl_leave (user_id, date_requested, leave_type, department, used_leave, days_remaining, current_status, startdate, end_date, comments)
                 VALUES (?, NOW(), ?, ?, ?, ?, 'Pending', ?, ?, ?)");
                 if ($stmt === false) {
                     $error = "Prepare failed: (" . $conn->errno . ") " . $conn->error;
@@ -99,6 +102,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+
+    // After successful submission, prepare leave details for email
+    $start = new DateTime($_POST['startdate']);
+    $end = new DateTime($_POST['end_date']);
+    $duration = $end->diff($start)->days + 1;
+
+    $leaveDetails = [
+        'employee_name' => $_POST['employee_name'],
+        'department' => $_POST['department'],
+        'leave_type' => $_POST['leave_type'],
+        'start_date' => $start->format('d M Y'),
+        'end_date' => $end->format('d M Y'),
+        'duration' => $duration,
+        'reason' => $_POST['reason']
+    ];
+
+    // Get user's email from database
+    $stmt = $conn->prepare("SELECT email FROM tbl_user WHERE user_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user) {
+        // Send confirmation email
+        $emailService = new EmailService();
+        $emailService->sendLeaveApplicationConfirmation($user['email'], $leaveDetails);
+    }
+
+    // Continue with your existing redirect...
+    header('Location: user_portal.php?status=success');
+    exit();
 }
 
 // Close the database connection
