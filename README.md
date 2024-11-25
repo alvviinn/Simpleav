@@ -1,4 +1,4 @@
-# SimpleAV
+**# Simpleav**
 
 SimpleAV is an easy-to-use leave management system designed to streamline the process of applying for, managing, and approving employee leave. It’s built to enhance user experience with an intuitive interface for both employees and managers.
 
