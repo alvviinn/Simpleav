@@ -85,7 +85,9 @@ body{
 <body>
     <nav class="navigation">
         <div class="nav">
+            <a href="User Interface/login.html">
             <img src="logo2.png" alt="logo">
+        </a>
             <h2 class="simpleav">SimpLeav</h2>
         </div> 
     </nav>
@@ -100,6 +102,7 @@ body{
                     <th>Leave History</th>
                 </tr>
             </thead>
+            
             <tbody>
                 <?php foreach ($staffData as $staff): ?>
                     <tr>
@@ -141,7 +144,9 @@ body{
             document.getElementById('leaveDetailsModal').style.display = 'none';
         }
     </script>
+   
 </body>
 </html>
 
-<?php $conn->close(); ?>
+
+

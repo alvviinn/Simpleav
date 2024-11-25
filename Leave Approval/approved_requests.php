@@ -12,8 +12,6 @@ $result = $conn->query($query);
 
 ?>
 
-Approved requests top
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,11 +30,11 @@ Approved requests top
             height: 100vh;
             background-size: cover;
         }
-        
+
     .nav{
-    width:200px;
-    float: left;
-    height: 50px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
     }
     .nav img {
     width: 100px;
@@ -56,17 +54,16 @@ Approved requests top
     margin-bottom: 200px;
     margin-left: 80px;
     height: 20px;
-  
+
 }
  .container {
             background-color: #fff;
             padding: 60px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 200%;
-            max-width: 800px;
-            margin-left: -20px;
-            margin-right: 70px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .container h2{
             color: rgba(54, 152, 243, 0.975);
@@ -107,8 +104,7 @@ Approved requests top
     <nav class="navigation">
         <div class="nav">
             <img src="logo2.png" alt="logo">
-            <h2 class="simpleav">SimpLeav</h2>
-        </div> 
+        </div>
     </nav>
     <div class="container">
         <h2>Approved Requests</h2>

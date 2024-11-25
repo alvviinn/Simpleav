@@ -56,7 +56,7 @@ $staffData = fetchStaffData($conn);
     height: 105px;
     size: 20px;
     background-color: transparent;
-    
+
 }
 
 .simpleav{
@@ -66,7 +66,7 @@ $staffData = fetchStaffData($conn);
     font-weight: 500;
     margin-top: -80px;
     margin-left: 100px;
-  
+
 }
 body{
     width: 100%;
@@ -112,6 +112,20 @@ body{
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        .back-btn {
+            display: block; /* Center the button */
+            margin: 40px auto; /* Adjust margin to lower the button */
+            padding: 10px 20px; /* Add padding for better appearance */
+            background-color: rgba(50, 135, 214, 0.975); /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 16px; /* Font size */
+        }
+        .back-btn:hover {
+            background-color: rgba(30, 100, 160, 0.975); /* Darker shade on hover */
+        }
     </style>
 </head>
 <body>
@@ -119,7 +133,7 @@ body{
         <div class="nav">
             <img src="logo2.png" alt="logo">
             <h2 class="simpleav">SimpLeav</h2>
-        </div> 
+        </div>
     </nav>
     <div class="container">
         <h2>Staff Section</h2>
@@ -143,6 +157,7 @@ body{
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">HOME PAGE</button>
     </div>
 
     <!-- Modal for Leave Details -->

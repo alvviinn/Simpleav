@@ -113,7 +113,7 @@
             height: 40px;
             border-radius: 50%;
         }
-        
+
         .nav{
     width:200px;
     float: left;
@@ -124,7 +124,7 @@
     height: 105px;
     size: 30px;
     background-color: transparent;
-    
+
 }
 .simpleav{
     text-decoration: none;
@@ -133,7 +133,7 @@
     font-weight: 500;
     margin-top: -80px;
     margin-left: 100px;
-  
+
 }
 body{
     width: 100%;
@@ -183,7 +183,7 @@ $conn->close();
         <div class="nav">
             <img src="logo2.png" alt="logo">
             <h2 class="simpleav">SimpLeav</h2>
-        </div> 
+        </div>
     </nav>
     <div class="container">
         <!-- Sidebar -->
@@ -191,8 +191,6 @@ $conn->close();
             <ul>
                 <div class="color">
                     <li><a href="dashboard.html" class="button-link">Dashboard</a></li>
-                    <li><a href="#">Analytics</a></li>
-                    <li><a href="#">Budgets</a></li>
                 </div>
             </ul>
         </aside>
@@ -201,15 +199,6 @@ $conn->close();
         <main class="main-content">
             <!-- Header with Navigation -->
             <header>
-                <nav>
-                    <ul>
-                        <li><a href="#">HOME</a></li>
-                        <li><a href="#">ABOUT US</a></li>
-                    </ul>
-                </nav>
-                <div class="profile">
-                    <img src="profile-placeholder.png" alt="Profile" class="profile-img">
-                </div>
             </header>
 
             <!-- Leave Dashboard Section -->
@@ -232,6 +221,25 @@ $conn->close();
     </div>
 
     <script>
+        // Randomly generate leave data for demonstration
+        function getRandomLeaveData() {
+            return {
+                earned: Math.floor(Math.random() * 100),
+                casual: Math.floor(Math.random() * 100),
+                sick: Math.floor(Math.random() * 100),
+                maternity: Math.floor(Math.random() * 100),
+                sabbatical: Math.floor(Math.random() * 100)
+            };
+        }
+
+        // Randomly generate monthly leave data for demonstration
+        function getRandomMonthlyLeaves() {
+            return Array.from({ length: 12 }, () => Math.floor(Math.random() * 50));
+        }
+
+        var leaveData = getRandomLeaveData();
+        var monthlyLeaves = getRandomMonthlyLeaves();
+
         // Pie Charts Configuration
         function createChart(elementId, title, remaining) {
             const ctx = document.getElementById(elementId).getContext('2d');
@@ -240,7 +248,7 @@ $conn->close();
                 data: {
                     labels: ['Used', 'Remaining'],
                     datasets: [{
-                        data: [30, remaining],
+                        data: [Math.floor(Math.random() * 30), remaining], // Random used data
                         backgroundColor: ['#FF6384', '#36A2EB'],
                     }]
                 },
@@ -300,7 +308,5 @@ $conn->close();
             }
         });
     </script>
-
-    <button><a href="dashboard.html">DASHBOARD</a></button>
 </body>
 </html>

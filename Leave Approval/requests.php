@@ -48,6 +48,10 @@ $conn->close();
     <title>Pending Requests</title>
     <style>
         /* Your existing CSS */
+        .back-btn {
+            display: block; /* Center the button */
+            margin: 200px auto; /* Adjust margin to lower the button further */
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,7 @@ $conn->close();
         <div class="nav">
             <img src="logo2.png" alt="logo">
             <h2 class="simpleav">SimpLeav</h2>
-        </div> 
+        </div>
     </nav>
     <div class="container">
         <h2>Pending Requests</h2>
